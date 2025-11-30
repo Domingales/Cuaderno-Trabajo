@@ -160,7 +160,7 @@
     inputCantidad.type = 'number';
     inputCantidad.className = 'material-cantidad';
     inputCantidad.min = '0';
-    inputCantidad.step = '1';
+    inputCantidad.step = '0.01';
     inputCantidad.placeholder = 'Cant.';
     if (cantidad !== '' && cantidad !== null && cantidad !== undefined) {
       inputCantidad.value = cantidad;
@@ -184,24 +184,37 @@
     agregarFilaMaterial();
   }
 
+  // 👉 Normaliza cantidades, asegura número y detecta errores
   function obtenerMaterialesDesdeFormulario() {
     const items = materialesContainer.querySelectorAll('.material-item');
     const nombres = [];
     const cantidades = [];
+    let invalidCantidad = false;
 
     items.forEach(item => {
       const nombreInput = item.querySelector('.material-nombre');
       const cantidadInput = item.querySelector('.material-cantidad');
       const nombre = (nombreInput.value || '').trim();
-      const cantidadVal = cantidadInput.value;
+      const cantidadRaw = (cantidadInput.value || '').trim();
 
-      if (nombre || cantidadVal) {
+      let num = null;
+
+      if (cantidadRaw) {
+        // Permitir formato "1.234,56" o "1234,56" o "1234.56"
+        let normalizada = cantidadRaw.replace(/\./g, '').replace(',', '.');
+        num = Number(normalizada);
+        if (!isFinite(num)) {
+          invalidCantidad = true;
+        }
+      }
+
+      if (nombre || cantidadRaw) {
         nombres.push(nombre);
-        cantidades.push(cantidadVal ? Number(cantidadVal) : null);
+        cantidades.push(num !== null ? num : null);
       }
     });
 
-    return { nombres, cantidades };
+    return { nombres, cantidades, invalidCantidad };
   }
 
   function agregarTrabajoCompletado(texto = '') {
@@ -294,7 +307,7 @@
     return h * 60 + m;
   }
 
-  // 👉 NUEVO: formatear decimal de horas a "HH:MM = x,xx h"
+  // 👉 Total horas: decimal → "HH:MM = x,xx h"
   function formatearHorasTotal(horasDec) {
     if (horasDec == null || isNaN(horasDec)) return '';
     const totalMin = Math.round(horasDec * 60);
@@ -304,6 +317,15 @@
     const mm = String(m).padStart(2, '0');
     const horasStr = horasDec.toFixed(2).replace('.', ',');
     return `${hh}:${mm} = ${horasStr} h`;
+  }
+
+  // 👉 Cantidad: número → "X.XXX,XX" (formato español)
+  function formatearCantidad(num) {
+    if (num == null || isNaN(num)) return '';
+    return Number(num).toLocaleString('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
 
   function actualizarTotalHoras() {
@@ -337,7 +359,6 @@
     if (trabajoMin < 0) trabajoMin = 0;
 
     const horas = trabajoMin / 60;
-    // En el formulario dejamos solo el decimal (como antes)
     campoTotalHoras.value = horas.toFixed(2).replace('.', ',');
   }
 
@@ -372,7 +393,12 @@
     const totalHorasStr = campoTotalHoras.value.replace(',', '.');
     const totalHoras = totalHorasStr ? parseFloat(totalHorasStr) : null;
 
-    const { nombres: materialesArr, cantidades: cantidadesArr } = obtenerMaterialesDesdeFormulario();
+    const {
+      nombres: materialesArr,
+      cantidades: cantidadesArr,
+      invalidCantidad
+    } = obtenerMaterialesDesdeFormulario();
+
     const trabajosCompletadosArr = obtenerTrabajosCompletadosDesdeFormulario();
     const trabajosPendientesArr = obtenerTrabajosPendientesDesdeFormulario();
 
@@ -385,6 +411,11 @@
 
     if (totalHoras === null || isNaN(totalHoras)) {
       alert('Revisa las horas y el descanso. No se ha podido calcular el total de horas.');
+      return;
+    }
+
+    if (invalidCantidad) {
+      alert('Alguna cantidad de material no es un número válido.\nUsa formato como 1.234,56 o 1234,56.');
       return;
     }
 
@@ -432,7 +463,6 @@
     if (campoDescanso) campoDescanso.value = reg.descanso || '00:00';
     campoObservaciones.value = reg.observaciones || '';
 
-    // Total horas al formulario (solo decimal, como se guarda)
     if (reg.totalHoras != null && !isNaN(reg.totalHoras)) {
       campoTotalHoras.value = reg.totalHoras.toFixed(2).replace('.', ',');
     } else {
@@ -592,7 +622,6 @@
       tdDescanso.textContent = reg.descanso || '00:00';
 
       const tdHoras = document.createElement('td');
-      // 👉 AQUÍ USAMOS EL NUEVO FORMATO "HH:MM = x,xx h"
       tdHoras.textContent =
         reg.totalHoras != null && !isNaN(reg.totalHoras)
           ? formatearHorasTotal(reg.totalHoras)
@@ -605,14 +634,21 @@
         tdMateriales.textContent = reg.materiales.join(' ');
         if (Array.isArray(reg.cantidades)) {
           tdCantidad.textContent = reg.cantidades
-            .map(c => (c !== null && c !== undefined ? c : ''))
+            .map(c => {
+              if (c === null || c === undefined || isNaN(c)) return '';
+              return formatearCantidad(c);
+            })
             .join(' ');
         } else {
           tdCantidad.textContent = '';
         }
       } else {
         tdMateriales.textContent = reg.materiales || '';
-        tdCantidad.textContent = reg.cantidad != null ? reg.cantidad : '';
+        if (reg.cantidad != null && !isNaN(reg.cantidad)) {
+          tdCantidad.textContent = formatearCantidad(reg.cantidad);
+        } else {
+          tdCantidad.textContent = '';
+        }
       }
 
       const tdCompletado = document.createElement('td');
