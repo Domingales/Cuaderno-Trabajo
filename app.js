@@ -710,27 +710,42 @@
   // Exportar / Importar
   // ===============================
 
-  function exportarJSON() {
-    if (!registros.length) {
-      alert('No hay registros para exportar.');
-      return;
-    }
-
-    const blob = new Blob([JSON.stringify(registros, null, 2)], {
-      type: 'application/json'
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const fecha = new Date().toISOString().slice(0, 10);
-
-    a.href = url;
-    a.download = `cuaderno_mantenimiento_${fecha}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+function exportarJSON() {
+  if (!registros.length) {
+    alert('No hay registros para exportar.');
+    return;
   }
+
+  const fecha = new Date().toISOString().slice(0, 10);
+  const nombreArchivo = `cuaderno_mantenimiento_${fecha}.json`;
+
+  const contenido = JSON.stringify(registros, null, 2);
+  const blob = new Blob([contenido], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  // Crear enlace invisible
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombreArchivo;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Mostrar mensaje con información exacta
+  const tamañoKB = (contenido.length / 1024).toFixed(1);
+
+  alert(
+    "📁 Archivo exportado correctamente.\n\n" +
+    "📄 Nombre del archivo:\n" +
+    "   " + nombreArchivo + "\n\n" +
+    "📍 Guardado en la carpeta (por WebIntoApp):\n" +
+    "   /storage/emulated/0/Download/\n\n" +
+    "📦 Tamaño aproximado:\n" +
+    "   " + tamañoKB + " KB\n\n" +
+    "✔ Ya puedes buscarlo en la carpeta Descargas de tu móvil."
+  );
+}
 
   function importarJSON(e) {
     const file = e.target.files[0];
