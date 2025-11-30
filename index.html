@@ -9,7 +9,7 @@
 <body>
   <header class="app-header">
     <h1>Cuaderno de Mantenimiento</h1>
-    <p>Centros de recogida de aceituna</p>
+    <p>Partes de trabajo</p>
   </header>
 
   <main class="app-main">
@@ -23,10 +23,10 @@
           <input type="date" id="fecha" required>
         </div>
 
-        <!-- Empresa (NUEVO) -->
+        <!-- Empresa -->
         <div class="form-row">
           <label for="empresa">Empresa</label>
-          <input type="text" id="empresa" placeholder="Ej: Cooperativa Santisimo Cristo">
+          <input type="text" id="empresa" placeholder="Ej: Santisimo Cristo">
         </div>
 
         <!-- Localidad -->
@@ -38,7 +38,7 @@
         <!-- Ubicación -->
         <div class="form-row">
           <label for="ubicacion">Ubicación</label>
-          <input type="text" id="ubicacion" placeholder="Ej: Centro de recogida aceituna" required>
+          <input type="text" id="ubicacion" placeholder="Ej: Poligono" required>
         </div>
 
         <!-- Horas -->
@@ -52,6 +52,10 @@
             <input type="time" id="horaFin" required>
           </div>
           <div>
+            <label for="descanso">Descanso</label>
+            <input type="time" id="descanso" value="00:00">
+          </div>
+          <div>
             <label for="totalHoras">Total horas</label>
             <input type="text" id="totalHoras" readonly>
           </div>
@@ -61,10 +65,9 @@
         <div class="form-row">
           <label>Materiales empleados</label>
           <div id="materiales-container">
-            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
             <div class="form-row-inline material-item">
               <div class="flex-grow">
-                <input type="text" class="material-nombre" placeholder="Material...">
+                <input type="text" class="material-nombre" placeholder="Rodamiento...">
               </div>
               <div class="cantidad-box">
                 <input type="number" class="material-cantidad" min="0" step="1" placeholder="Cant.">
@@ -78,7 +81,6 @@
         <div class="form-row">
           <label>Trabajos completados</label>
           <div id="trabajos-completados-container">
-            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
             <div class="form-row-inline trabajo-item">
               <textarea class="trabajo-completado" rows="2" placeholder="Ej: Cambio de correa, engrase..."></textarea>
               <button type="button" class="btn-secondary btn-small btn-add-trabajo-completado">+</button>
@@ -90,7 +92,6 @@
         <div class="form-row">
           <label>Trabajos pendientes</label>
           <div id="trabajos-pendientes-container">
-            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
             <div class="form-row-inline trabajo-item">
               <textarea class="trabajo-pendiente" rows="2" placeholder="Ej: Revisar poleas, revisar motor..."></textarea>
               <button type="button" class="btn-secondary btn-small btn-add-trabajo-pendiente">+</button>
@@ -126,7 +127,6 @@
           <input type="text" id="busqueda" placeholder="Filtrar en los registros...">
         </div>
 
-        <!-- Filtro por trabajos pendientes -->
         <div class="toolbar-group-inline">
           <div>
             <label for="filtroPendientes">Mostrar</label>
@@ -166,17 +166,17 @@
               <th>Ubicación</th>
               <th>Inicio</th>
               <th>Fin</th>
+              <th>Descanso</th>
               <th>Horas</th>
               <th>Materiales</th>
               <th>Cant.</th>
               <th>Completado</th>
               <th>Pendiente</th>
-              <th>Obs.</th>
+              <th>Observaciones</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tbody-registros">
-            <!-- Aquí se insertan las filas dinámicamente -->
           </tbody>
         </table>
       </div>
