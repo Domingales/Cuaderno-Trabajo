@@ -1,295 +1,243 @@
-﻿*,
-*::before,
-*::after {
-  box-sizing: border-box;
+:root{
+  --bg:#020617;
+  --panel:#0f172a;
+  --accent:#22c55e;
+  --accent2:#ef4444;
+  --accent3:#eab308;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --border:#1f2937;
+  --radius:14px;
+  --shadow:0 12px 30px rgba(0,0,0,0.45);
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
+*{
+  box-sizing:border-box;
 }
 
-body {
-  min-height: 100vh;
+html,body{
+  margin:0;
+  padding:0;
+  background:radial-gradient(circle at top,#0b1120 0,#020617 55%);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--text);
 }
 
-/* ENCABEZADO */
-.app-header {
-  background: linear-gradient(135deg, #1f2937, #0f172a);
-  padding: 1rem 1.2rem 0.8rem;
-  border-bottom: 1px solid #111827;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+/* ===========================
+   CONTENEDORES GENERALES
+   =========================== */
+
+.app-header{
+  text-align:center;
+  padding:1rem 0;
+  background:var(--panel);
+  box-shadow:var(--shadow);
 }
 
-.app-header h1 {
-  font-size: 1.4rem;
-  margin: 0;
+.app-header h1{
+  margin:0;
+  font-size:1.4rem;
 }
 
-.app-header p {
-  margin: 0.15rem 0 0;
-  font-size: 0.85rem;
-  color: #9ca3af;
+.app-main{
+  width:95%;
+  max-width:800px;
+  margin:1rem auto 3rem auto;
 }
 
-/* CONTENIDO PRINCIPAL */
-.app-main {
-  padding: 0.8rem;
-  max-width: 1200px;
-  margin: 0 auto 3rem;
+.card{
+  background:var(--panel);
+  padding:1rem;
+  border-radius:var(--radius);
+  margin-bottom:1rem;
+  box-shadow:var(--shadow);
 }
 
-/* TARJETAS */
-.card {
-  background: #020617;
-  border-radius: 0.75rem;
-  border: 1px solid #1f2937;
-  padding: 0.9rem;
-  margin-bottom: 0.9rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+.app-footer{
+  text-align:center;
+  padding:1rem 0;
+  background:var(--panel);
+  margin-top:2rem;
+  font-size:0.85rem;
 }
 
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 0.7rem;
-  font-size: 1.05rem;
-  color: #f9fafb;
+/* ===========================
+   FORMULARIO
+   =========================== */
+
+.form-row{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:0.6rem;
 }
 
-/* FORMULARIO */
-.form-row,
-.form-row-inline {
-  margin-bottom: 0.6rem;
+.form-row-inline{
+  display:flex;
+  gap:0.6rem;
+  margin-bottom:0.6rem;
 }
 
-.form-row label,
-.form-row-inline label {
-  display: block;
-  margin-bottom: 0.22rem;
-  font-size: 0.85rem;
-  color: #9ca3af;
+.form-row-inline > div{
+  flex:1;
+}
+
+label{
+  margin-bottom:0.25rem;
+  font-size:0.9rem;
+  color:var(--muted);
 }
 
 input[type="text"],
 input[type="date"],
 input[type="time"],
 input[type="number"],
-textarea {
-  width: 100%;
-  padding: 0.45rem 0.55rem;
-  border-radius: 0.5rem;
-  border: 1px solid #374151;
-  background: #020617;
-  color: #e5e7eb;
-  font-size: 0.9rem;
+textarea,
+select{
+  width:100%;
+  padding:0.4rem 0.5rem;
+  background:#1e293b;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  font-size:0.9rem;
 }
 
-input[readonly] {
-  background: #030712;
-  color: #9ca3af;
+textarea{
+  resize:vertical;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 2.5rem;
+.btn-primary{
+  background:var(--accent);
+  border:none;
+  padding:0.55rem 1rem;
+  border-radius:var(--radius);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-/* FILAS EN LÍNEA */
-.form-row-inline {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.btn-secondary{
+  background:#475569;
+  border:none;
+  padding:0.55rem 1rem;
+  border-radius:var(--radius);
+  color:var(--text);
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.form-row-inline > div {
-  flex: 1 1 0;
+.btn-danger{
+  background:var(--accent2);
+  border:none;
+  padding:0.55rem 1rem;
+  border-radius:var(--radius);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.flex-grow {
-  flex: 2 1 0;
+.btn-small{
+  padding:0.25rem 0.5rem;
+  font-size:0.75rem;
 }
 
-.cantidad-box {
-  max-width: 120px;
+.btn-file{
+  display:inline-block;
+  cursor:pointer;
 }
 
-/* BOTONES */
-.form-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.8rem;
+/* Modo edición */
+.modo-edicion{
+  margin-top:0.8rem;
+  font-size:0.85rem;
+  color:var(--accent3);
 }
 
-button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+.oculto{
+  display:none;
 }
 
-button:active {
-  transform: scale(0.97);
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+/* ===========================
+   TABLA
+   =========================== */
+
+.tabla-wrapper{
+  overflow-x:auto;
 }
 
-.btn-primary {
-  background: #22c55e;
-  color: #022c22;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
-}
-
-.btn-primary:hover {
-  background: #16a34a;
-}
-
-.btn-secondary {
-  background: #1f2937;
-  color: #e5e7eb;
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.7);
-}
-
-.btn-secondary:hover {
-  background: #111827;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: #fef2f2;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-.btn-small {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.75rem;
-}
-
-/* BOTÓN-INPUT PARA ARCHIVO */
-.btn-file {
-  display: inline-block;
-  text-align: center;
-}
-
-/* MODO EDICIÓN */
-.modo-edicion {
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: #fde68a;
-}
-
-.oculto {
-  display: none;
-}
-
-/* TOOLBAR */
-.toolbar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.toolbar-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.toolbar-group-inline {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.toolbar-group input[type="text"] {
-  max-width: 360px;
-}
-
-/* TABLA */
-.tabla-wrapper {
-  overflow-x: auto;
-  margin-top: 0.5rem;
-}
-
-.tabla-registros {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.78rem;
-}
-
-.tabla-registros thead {
-  background: #020617;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+.tabla-registros{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.78rem;
+  table-layout: fixed;              /* ← NECESARIO para mantener anchos */
 }
 
 .tabla-registros th,
-.tabla-registros td {
-  border: 1px solid #1f2937;
-  padding: 0.25rem 0.4rem;
-  vertical-align: top;
-  text-align: left;
+.tabla-registros td{
+  border:1px solid var(--border);
+  padding:0.25rem 0.4rem;
+  vertical-align:top;
+  text-align:left;
+
+  /* === NUEVO PARA CONTROL DE ANCHOS ==== */
+  min-width:10ch;                   /* ~10 caracteres */
+  max-width:20ch;                   /* ~20 caracteres */
+  white-space:normal;               /* permite salto de línea */
+  word-wrap:break-word;             /* rompe palabras largas */
+  overflow-wrap:break-word;
 }
 
-.tabla-registros th {
-  font-weight: 600;
-  color: #e5e7eb;
+.tabla-registros th{
+  background:#1e293b;
+  font-weight:bold;
+  color:var(--muted);
 }
 
-.tabla-registros tbody tr:nth-child(even) {
-  background: #020617;
+.acciones{
+  display:flex;
+  flex-direction:column;
+  gap:0.3rem;
 }
 
-.tabla-registros tbody tr:nth-child(odd) {
-  background: #030712;
+.contador{
+  margin-bottom:0.6rem;
+  color:var(--muted);
 }
 
-.tabla-registros td.acciones {
-  white-space: nowrap;
+/* ===========================
+   HERRAMIENTAS
+   =========================== */
+
+.toolbar-actions{
+  display:flex;
+  flex-direction:column;
+  gap:0.7rem;
 }
 
-/* CONTADOR */
-.contador {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin: 0.1rem 0 0.3rem;
+.toolbar-group,
+.toolbar-group-inline{
+  display:flex;
+  flex-direction:column;
+  gap:0.3rem;
 }
 
-/* FOOTER */
-.app-footer {
-  text-align: center;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  color: #6b7280;
-  border-top: 1px solid #111827;
-  background: #020617;
+.toolbar-group-inline{
+  flex-direction:row;
+  align-items:center;
 }
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .app-main {
-    padding: 0.6rem;
-  }
+.toolbar-group-inline > *{
+  flex:1;
+}
 
-  .card {
-    padding: 0.75rem;
-  }
+/* ===========================
+   EXTRAS
+   =========================== */
 
-  .app-header h1 {
-    font-size: 1.2rem;
-  }
+.flex-grow{
+  flex:1;
+}
 
-  .tabla-registros th,
-  .tabla-registros td {
-    font-size: 0.7rem;
-  }
+.cantidad-box{
+  width:80px;
 }
