@@ -180,8 +180,8 @@ textarea{
   text-align:left;
 
   /* === NUEVO PARA CONTROL DE ANCHOS ==== */
-  min-width:10ch;                   /* ~10 caracteres */
-  max-width:20ch;                   /* ~20 caracteres */
+  min-width:20ch;                   /* ~10 caracteres */
+  max-width:40ch;                   /* ~20 caracteres */
   white-space:normal;               /* permite salto de línea */
   word-wrap:break-word;             /* rompe palabras largas */
   overflow-wrap:break-word;
