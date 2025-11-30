@@ -1,4 +1,4 @@
-﻿// ===============================
+// ===============================
 //  Cuaderno de Mantenimiento
 //  Lógica principal
 // ===============================
@@ -14,6 +14,7 @@
   const form = document.getElementById('form-registro');
 
   const campoFecha = document.getElementById('fecha');
+  const campoEmpresa = document.getElementById('empresa'); // NUEVO
   const campoLocalidad = document.getElementById('localidad');
   const campoUbicacion = document.getElementById('ubicacion');
   const campoHoraInicio = document.getElementById('horaInicio');
@@ -35,7 +36,7 @@
   const contadorRegistros = document.getElementById('contador-registros');
 
   const inputBusqueda = document.getElementById('busqueda');
-  const selectFiltroPendientes = document.getElementById('filtroPendientes'); // NUEVO
+  const selectFiltroPendientes = document.getElementById('filtroPendientes');
   const btnExportar = document.getElementById('btn-exportar');
   const inputImport = document.getElementById('archivoImport');
   const btnBorrarTodo = document.getElementById('btn-borrar-todo');
@@ -329,6 +330,7 @@
     e.preventDefault();
 
     const fecha = campoFecha.value;
+    const empresa = (campoEmpresa.value || '').trim();
     const localidad = (campoLocalidad.value || '').trim();
     const ubicacion = (campoUbicacion.value || '').trim();
     const horaInicio = campoHoraInicio.value;
@@ -342,7 +344,7 @@
 
     const observaciones = (campoObservaciones.value || '').trim();
 
-    // Validación mínima
+    // Validación mínima (igual que antes, sin obligar empresa)
     if (!fecha || !localidad || !ubicacion || !horaInicio || !horaFin) {
       alert('Por favor, rellena al menos: Fecha, Localidad, Ubicación, Hora inicio y Hora fin.');
       return;
@@ -356,6 +358,7 @@
     const registro = {
       id: idEditando || generarId(),
       fecha,
+      empresa,
       localidad,
       ubicacion,
       horaInicio,
@@ -391,6 +394,7 @@
     if (!reg) return;
 
     campoFecha.value = reg.fecha || '';
+    campoEmpresa.value = reg.empresa || '';
     campoLocalidad.value = reg.localidad || '';
     campoUbicacion.value = reg.ubicacion || '';
     campoHoraInicio.value = reg.horaInicio || '';
@@ -495,6 +499,7 @@
       if (filtroTexto) {
         const texto = [
           reg.fecha,
+          reg.empresa, // NUEVO en búsqueda
           reg.localidad,
           reg.ubicacion,
           Array.isArray(reg.materiales) ? reg.materiales.join(' ') : reg.materiales,
@@ -537,6 +542,9 @@
 
       const tdFecha = document.createElement('td');
       tdFecha.textContent = reg.fecha || '';
+
+      const tdEmpresa = document.createElement('td');
+      tdEmpresa.textContent = reg.empresa || '';
 
       const tdLocalidad = document.createElement('td');
       tdLocalidad.textContent = reg.localidad || '';
@@ -605,6 +613,7 @@
       tdAcciones.appendChild(btnDel);
 
       tr.appendChild(tdFecha);
+      tr.appendChild(tdEmpresa);
       tr.appendChild(tdLocalidad);
       tr.appendChild(tdUbicacion);
       tr.appendChild(tdInicio);
