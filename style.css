@@ -1,0 +1,295 @@
+﻿*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ENCABEZADO */
+.app-header {
+  background: linear-gradient(135deg, #1f2937, #0f172a);
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid #111827;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.app-header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.app-header p {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* CONTENIDO PRINCIPAL */
+.app-main {
+  padding: 0.8rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+}
+
+/* TARJETAS */
+.card {
+  background: #020617;
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  padding: 0.9rem;
+  margin-bottom: 0.9rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
+  color: #f9fafb;
+}
+
+/* FORMULARIO */
+.form-row,
+.form-row-inline {
+  margin-bottom: 0.6rem;
+}
+
+.form-row label,
+.form-row-inline label {
+  display: block;
+  margin-bottom: 0.22rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+input[readonly] {
+  background: #030712;
+  color: #9ca3af;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+/* FILAS EN LÍNEA */
+.form-row-inline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-row-inline > div {
+  flex: 1 1 0;
+}
+
+.flex-grow {
+  flex: 2 1 0;
+}
+
+.cantidad-box {
+  max-width: 120px;
+}
+
+/* BOTONES */
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.btn-primary {
+  background: #22c55e;
+  color: #022c22;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn-secondary {
+  background: #1f2937;
+  color: #e5e7eb;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.7);
+}
+
+.btn-secondary:hover {
+  background: #111827;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fef2f2;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+/* BOTÓN-INPUT PARA ARCHIVO */
+.btn-file {
+  display: inline-block;
+  text-align: center;
+}
+
+/* MODO EDICIÓN */
+.modo-edicion {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #fde68a;
+}
+
+.oculto {
+  display: none;
+}
+
+/* TOOLBAR */
+.toolbar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toolbar-group-inline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toolbar-group input[type="text"] {
+  max-width: 360px;
+}
+
+/* TABLA */
+.tabla-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.tabla-registros {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.tabla-registros thead {
+  background: #020617;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tabla-registros th,
+.tabla-registros td {
+  border: 1px solid #1f2937;
+  padding: 0.25rem 0.4rem;
+  vertical-align: top;
+  text-align: left;
+}
+
+.tabla-registros th {
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.tabla-registros tbody tr:nth-child(even) {
+  background: #020617;
+}
+
+.tabla-registros tbody tr:nth-child(odd) {
+  background: #030712;
+}
+
+.tabla-registros td.acciones {
+  white-space: nowrap;
+}
+
+/* CONTADOR */
+.contador {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0.1rem 0 0.3rem;
+}
+
+/* FOOTER */
+.app-footer {
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  border-top: 1px solid #111827;
+  background: #020617;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .app-main {
+    padding: 0.6rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .tabla-registros th,
+  .tabla-registros td {
+    font-size: 0.7rem;
+  }
+}

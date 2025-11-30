@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuaderno de Mantenimiento</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Cuaderno de Mantenimiento</h1>
+    <p>Centros de recogida de aceituna</p>
+  </header>
+
+  <main class="app-main">
+    <!-- FORMULARIO -->
+    <section class="card">
+      <h2>Nuevo registro / Editar</h2>
+      <form id="form-registro">
+        <!-- Fecha -->
+        <div class="form-row">
+          <label for="fecha">Fecha</label>
+          <input type="date" id="fecha" required>
+        </div>
+
+        <!-- Localidad -->
+        <div class="form-row">
+          <label for="localidad">Localidad</label>
+          <input type="text" id="localidad" placeholder="Ej: Montilla" required>
+        </div>
+
+        <!-- Ubicación -->
+        <div class="form-row">
+          <label for="ubicacion">Ubicación</label>
+          <input type="text" id="ubicacion" placeholder="Ej: Centro 3 - Tolva" required>
+        </div>
+
+        <!-- Horas -->
+        <div class="form-row-inline">
+          <div>
+            <label for="horaInicio">Hora inicio</label>
+            <input type="time" id="horaInicio" required>
+          </div>
+          <div>
+            <label for="horaFin">Hora fin</label>
+            <input type="time" id="horaFin" required>
+          </div>
+          <div>
+            <label for="totalHoras">Total horas</label>
+            <input type="text" id="totalHoras" readonly>
+          </div>
+        </div>
+
+        <!-- Materiales (MÚLTIPLES) -->
+        <div class="form-row">
+          <label>Materiales empleados</label>
+          <div id="materiales-container">
+            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
+            <div class="form-row-inline material-item">
+              <div class="flex-grow">
+                <input type="text" class="material-nombre" placeholder="Material...">
+              </div>
+              <div class="cantidad-box">
+                <input type="number" class="material-cantidad" min="0" step="1" placeholder="Cant.">
+              </div>
+              <button type="button" class="btn-secondary btn-small btn-add-material">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trabajos completados (MÚLTIPLES) -->
+        <div class="form-row">
+          <label>Trabajos completados</label>
+          <div id="trabajos-completados-container">
+            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
+            <div class="form-row-inline trabajo-item">
+              <textarea class="trabajo-completado" rows="2" placeholder="Ej: Cambio de correa, engrase..."></textarea>
+              <button type="button" class="btn-secondary btn-small btn-add-trabajo-completado">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trabajos pendientes (MÚLTIPLES) -->
+        <div class="form-row">
+          <label>Trabajos pendientes</label>
+          <div id="trabajos-pendientes-container">
+            <!-- Se rellena y gestiona desde JS; arranca con una fila -->
+            <div class="form-row-inline trabajo-item">
+              <textarea class="trabajo-pendiente" rows="2" placeholder="Ej: Revisar poleas, revisar motor..."></textarea>
+              <button type="button" class="btn-secondary btn-small btn-add-trabajo-pendiente">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-row">
+          <label for="observaciones">Observaciones</label>
+          <textarea id="observaciones" rows="2" placeholder="Ruido leve, se recomienda revisar en 1 semana..."></textarea>
+        </div>
+
+        <!-- Botones del formulario -->
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="btn-guardar">Guardar registro</button>
+          <button type="button" class="btn-secondary" id="btn-cancelar">Cancelar / Limpiar</button>
+        </div>
+
+        <!-- Indicador de modo edición -->
+        <p id="modo-edicion" class="modo-edicion oculto">
+          Editando registro #<span id="edit-id"></span>
+        </p>
+      </form>
+    </section>
+
+    <!-- BARRA DE HERRAMIENTAS -->
+    <section class="toolbar card">
+      <h2>Herramientas</h2>
+      <div class="toolbar-actions">
+        <div class="toolbar-group">
+          <label for="busqueda">Buscar por localidad / texto</label>
+          <input type="text" id="busqueda" placeholder="Filtrar en los registros...">
+        </div>
+
+        <!-- NUEVO: Filtro por trabajos pendientes -->
+        <div class="toolbar-group-inline">
+          <div>
+            <label for="filtroPendientes">Mostrar</label>
+            <select id="filtroPendientes">
+              <option value="todos">Todos los registros</option>
+              <option value="conPendientes">Solo con trabajos pendientes</option>
+              <option value="sinPendientes">Solo sin trabajos pendientes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-group-inline">
+          <button type="button" id="btn-exportar" class="btn-secondary">Exportar JSON</button>
+          <label for="archivoImport" class="btn-secondary btn-file">Importar JSON</label>
+          <input type="file" id="archivoImport" accept="application/json" hidden>
+        </div>
+        <div class="toolbar-group">
+          <button type="button" id="btn-borrar-todo" class="btn-danger">
+            Borrar TODOS los registros
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE REGISTROS -->
+    <section class="card">
+      <h2>Registros guardados</h2>
+      <p id="contador-registros" class="contador">0 registros</p>
+
+      <div class="tabla-wrapper">
+        <table class="tabla-registros">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Localidad</th>
+              <th>Ubicación</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Horas</th>
+              <th>Materiales</th>
+              <th>Cant.</th>
+              <th>Completado</th>
+              <th>Pendiente</th>
+              <th>Obs.</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-registros">
+            <!-- Aquí se insertan las filas dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Cuaderno de trabajos · Mantenimiento centros de aceituna</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
