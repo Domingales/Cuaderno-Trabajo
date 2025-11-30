@@ -707,45 +707,162 @@
   }
 
   // ===============================
+  // Generación de contenido XLS (tabla HTML compatible con Excel)
+  // ===============================
+
+  function escaparHTML(texto) {
+    if (texto == null) return '';
+    return String(texto)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function generarContenidoXLS() {
+    let html = '<table border="1">';
+    html += '<thead><tr>';
+    const cabeceras = [
+      'Fecha',
+      'Empresa',
+      'Localidad',
+      'Ubicación',
+      'Inicio',
+      'Fin',
+      'Descanso',
+      'Total horas',
+      'Materiales',
+      'Cantidades',
+      'Trabajos completados',
+      'Trabajos pendientes',
+      'Observaciones'
+    ];
+    cabeceras.forEach(h => {
+      html += '<th>' + escaparHTML(h) + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+
+    registros.forEach(reg => {
+      const fecha = reg.fecha || '';
+      const empresa = reg.empresa || '';
+      const localidad = reg.localidad || '';
+      const ubicacion = reg.ubicacion || '';
+      const inicio = reg.horaInicio || '';
+      const fin = reg.horaFin || '';
+      const descanso = reg.descanso || '00:00';
+      const totalHorasStr =
+        reg.totalHoras != null && !isNaN(reg.totalHoras)
+          ? formatearHorasTotal(reg.totalHoras)
+          : '';
+
+      let materialesStr = '';
+      let cantidadesStr = '';
+
+      if (Array.isArray(reg.materiales)) {
+        materialesStr = reg.materiales.join(' | ');
+        if (Array.isArray(reg.cantidades)) {
+          cantidadesStr = reg.cantidades
+            .map(c => (c === null || c === undefined || isNaN(c) ? '' : formatearCantidad(c)))
+            .join(' | ');
+        }
+      } else {
+        materialesStr = reg.materiales || '';
+        if (reg.cantidad != null && !isNaN(reg.cantidad)) {
+          cantidadesStr = formatearCantidad(reg.cantidad);
+        }
+      }
+
+      let completadosStr = '';
+      if (Array.isArray(reg.trabajosCompletados)) {
+        completadosStr = reg.trabajosCompletados.join(' | ');
+      } else {
+        completadosStr = reg.trabajosCompletados || '';
+      }
+
+      let pendientesStr = '';
+      if (Array.isArray(reg.trabajosPendientes)) {
+        pendientesStr = reg.trabajosPendientes.join(' | ');
+      } else {
+        pendientesStr = reg.trabajosPendientes || '';
+      }
+
+      const observStr = reg.observaciones || '';
+
+      html += '<tr>';
+      html += '<td>' + escaparHTML(fecha) + '</td>';
+      html += '<td>' + escaparHTML(empresa) + '</td>';
+      html += '<td>' + escaparHTML(localidad) + '</td>';
+      html += '<td>' + escaparHTML(ubicacion) + '</td>';
+      html += '<td>' + escaparHTML(inicio) + '</td>';
+      html += '<td>' + escaparHTML(fin) + '</td>';
+      html += '<td>' + escaparHTML(descanso) + '</td>';
+      html += '<td>' + escaparHTML(totalHorasStr) + '</td>';
+      html += '<td>' + escaparHTML(materialesStr) + '</td>';
+      html += '<td>' + escaparHTML(cantidadesStr) + '</td>';
+      html += '<td>' + escaparHTML(completadosStr) + '</td>';
+      html += '<td>' + escaparHTML(pendientesStr) + '</td>';
+      html += '<td>' + escaparHTML(observStr) + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  // ===============================
   // Exportar / Importar
   // ===============================
 
-function exportarJSON() {
-  if (!registros.length) {
-    alert('No hay registros para exportar.');
-    return;
+  function exportarJSON() {
+    if (!registros.length) {
+      alert('No hay registros para exportar.');
+      return;
+    }
+
+    const fecha = new Date().toISOString().slice(0, 10);
+    const nombreJson = `cuaderno_mantenimiento_${fecha}.json`;
+    const nombreXls = `cuaderno_mantenimiento_${fecha}.xls`;
+
+    // --- JSON ---
+    const contenidoJson = JSON.stringify(registros, null, 2);
+    const blobJson = new Blob([contenidoJson], { type: 'application/json' });
+    const urlJson = URL.createObjectURL(blobJson);
+
+    const aJson = document.createElement('a');
+    aJson.href = urlJson;
+    aJson.download = nombreJson;
+    document.body.appendChild(aJson);
+    aJson.click();
+    document.body.removeChild(aJson);
+    URL.revokeObjectURL(urlJson);
+
+    // --- XLS (tabla HTML compatible con Excel) ---
+    const contenidoXls = generarContenidoXLS();
+    const blobXls = new Blob([contenidoXls], {
+      type: 'application/vnd.ms-excel'
+    });
+    const urlXls = URL.createObjectURL(blobXls);
+
+    const aXls = document.createElement('a');
+    aXls.href = urlXls;
+    aXls.download = nombreXls;
+    document.body.appendChild(aXls);
+    aXls.click();
+    document.body.removeChild(aXls);
+    URL.revokeObjectURL(urlXls);
+
+    const tamañoKB = (contenidoJson.length / 1024).toFixed(1);
+
+    alert(
+      "📁 Archivos exportados correctamente.\n\n" +
+      "Se han creado dos ficheros en la carpeta Descargas (/Download):\n\n" +
+      "1️⃣ JSON:\n   " + nombreJson + "\n" +
+      "2️⃣ Excel (.xls):\n   " + nombreXls + "\n\n" +
+      "📦 Tamaño aproximado del JSON:\n" +
+      "   " + tamañoKB + " KB\n\n" +
+      "Ábrelos desde la carpeta 'Descargas' de tu móvil."
+    );
   }
-
-  const fecha = new Date().toISOString().slice(0, 10);
-  const nombreArchivo = `cuaderno_mantenimiento_${fecha}.json`;
-
-  const contenido = JSON.stringify(registros, null, 2);
-  const blob = new Blob([contenido], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  // Crear enlace invisible
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nombreArchivo;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  // Mostrar mensaje con información exacta
-  const tamañoKB = (contenido.length / 1024).toFixed(1);
-
-  alert(
-    "📁 Archivo exportado correctamente.\n\n" +
-    "📄 Nombre del archivo:\n" +
-    "   " + nombreArchivo + "\n\n" +
-    "📍 Guardado en la carpeta (por WebIntoApp):\n" +
-    "   /storage/emulated/0/Download/\n\n" +
-    "📦 Tamaño aproximado:\n" +
-    "   " + tamañoKB + " KB\n\n" +
-    "✔ Ya puedes buscarlo en la carpeta Descargas de tu móvil."
-  );
-}
 
   function importarJSON(e) {
     const file = e.target.files[0];
