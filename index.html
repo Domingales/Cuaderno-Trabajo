@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -23,16 +23,22 @@
           <input type="date" id="fecha" required>
         </div>
 
+        <!-- Empresa (NUEVO) -->
+        <div class="form-row">
+          <label for="empresa">Empresa</label>
+          <input type="text" id="empresa" placeholder="Ej: Cooperativa Santisimo Cristo">
+        </div>
+
         <!-- Localidad -->
         <div class="form-row">
           <label for="localidad">Localidad</label>
-          <input type="text" id="localidad" placeholder="Ej: Montilla" required>
+          <input type="text" id="localidad" placeholder="Ej: Malagón" required>
         </div>
 
         <!-- Ubicación -->
         <div class="form-row">
           <label for="ubicacion">Ubicación</label>
-          <input type="text" id="ubicacion" placeholder="Ej: Centro 3 - Tolva" required>
+          <input type="text" id="ubicacion" placeholder="Ej: Centro de recogida aceituna" required>
         </div>
 
         <!-- Horas -->
@@ -120,7 +126,7 @@
           <input type="text" id="busqueda" placeholder="Filtrar en los registros...">
         </div>
 
-        <!-- NUEVO: Filtro por trabajos pendientes -->
+        <!-- Filtro por trabajos pendientes -->
         <div class="toolbar-group-inline">
           <div>
             <label for="filtroPendientes">Mostrar</label>
@@ -155,6 +161,7 @@
           <thead>
             <tr>
               <th>Fecha</th>
+              <th>Empresa</th>
               <th>Localidad</th>
               <th>Ubicación</th>
               <th>Inicio</th>
