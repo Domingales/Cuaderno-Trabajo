@@ -14,11 +14,12 @@
   const form = document.getElementById('form-registro');
 
   const campoFecha = document.getElementById('fecha');
-  const campoEmpresa = document.getElementById('empresa'); // NUEVO
+  const campoEmpresa = document.getElementById('empresa');
   const campoLocalidad = document.getElementById('localidad');
   const campoUbicacion = document.getElementById('ubicacion');
   const campoHoraInicio = document.getElementById('horaInicio');
   const campoHoraFin = document.getElementById('horaFin');
+  const campoDescanso = document.getElementById('descanso');
   const campoTotalHoras = document.getElementById('totalHoras');
   const campoObservaciones = document.getElementById('observaciones');
 
@@ -56,6 +57,9 @@
 
     campoHoraInicio.addEventListener('change', actualizarTotalHoras);
     campoHoraFin.addEventListener('change', actualizarTotalHoras);
+    if (campoDescanso) {
+      campoDescanso.addEventListener('change', actualizarTotalHoras);
+    }
 
     inputBusqueda.addEventListener('input', renderTabla);
     if (selectFiltroPendientes) {
@@ -126,7 +130,6 @@
   // ===============================
 
   function inicializarContenedores() {
-    // Aseguramos que haya al menos una fila de cada tipo
     if (!materialesContainer.querySelector('.material-item')) {
       agregarFilaMaterial();
     }
@@ -147,7 +150,7 @@
     const inputNombre = document.createElement('input');
     inputNombre.type = 'text';
     inputNombre.className = 'material-nombre';
-    inputNombre.placeholder = 'Material...';
+    inputNombre.placeholder = 'Rodamientos...';
     inputNombre.value = nombre || '';
     divNombre.appendChild(inputNombre);
 
@@ -278,45 +281,75 @@
   // ===============================
 
   function generarId() {
-    // id sencillo basado en fecha + aleatorio
     return Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36);
+  }
+
+  function parseHoraToMinutos(horaStr) {
+    if (!horaStr) return null;
+    const partes = horaStr.split(':');
+    if (partes.length !== 2) return null;
+    const h = Number(partes[0]);
+    const m = Number(partes[1]);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  }
+
+  // 👉 NUEVO: formatear decimal de horas a "HH:MM = x,xx h"
+  function formatearHorasTotal(horasDec) {
+    if (horasDec == null || isNaN(horasDec)) return '';
+    const totalMin = Math.round(horasDec * 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    const hh = String(h).padStart(2, '0');
+    const mm = String(m).padStart(2, '0');
+    const horasStr = horasDec.toFixed(2).replace('.', ',');
+    return `${hh}:${mm} = ${horasStr} h`;
   }
 
   function actualizarTotalHoras() {
     const hi = campoHoraInicio.value;
     const hf = campoHoraFin.value;
+    const descansoStr = campoDescanso ? campoDescanso.value : '00:00';
 
     if (!hi || !hf) {
       campoTotalHoras.value = '';
       return;
     }
 
-    const [hiH, hiM] = hi.split(':').map(Number);
-    const [hfH, hfM] = hf.split(':').map(Number);
+    let inicioMin = parseHoraToMinutos(hi);
+    let finMin = parseHoraToMinutos(hf);
 
-    let inicioMin = hiH * 60 + hiM;
-    let finMin = hfH * 60 + hfM;
+    if (inicioMin === null || finMin === null) {
+      campoTotalHoras.value = '';
+      return;
+    }
 
-    // Si la hora fin es "menor" que inicio, asumimos que pasa de medianoche
+    // Paso por medianoche
     if (finMin < inicioMin) {
       finMin += 24 * 60;
     }
 
-    const difMin = finMin - inicioMin;
-    const horas = difMin / 60;
+    let difMin = finMin - inicioMin;
+    let descansoMin = parseHoraToMinutos(descansoStr);
+    if (descansoMin === null) descansoMin = 0;
 
-    campoTotalHoras.value = horas.toFixed(2).replace('.', ','); // ejemplo: 2,75
+    let trabajoMin = difMin - descansoMin;
+    if (trabajoMin < 0) trabajoMin = 0;
+
+    const horas = trabajoMin / 60;
+    // En el formulario dejamos solo el decimal (como antes)
+    campoTotalHoras.value = horas.toFixed(2).replace('.', ',');
   }
 
   function limpiarFormulario() {
     form.reset();
     campoTotalHoras.value = '';
+    if (campoDescanso) campoDescanso.value = '00:00';
     idEditando = null;
     btnGuardar.textContent = 'Guardar registro';
     modoEdicionInfo.classList.add('oculto');
     editIdSpan.textContent = '';
 
-    // limpiar contenedores múltiples
     limpiarMateriales();
     limpiarTrabajosCompletados();
     limpiarTrabajosPendientes();
@@ -335,6 +368,7 @@
     const ubicacion = (campoUbicacion.value || '').trim();
     const horaInicio = campoHoraInicio.value;
     const horaFin = campoHoraFin.value;
+    const descanso = (campoDescanso && campoDescanso.value) ? campoDescanso.value : '00:00';
     const totalHorasStr = campoTotalHoras.value.replace(',', '.');
     const totalHoras = totalHorasStr ? parseFloat(totalHorasStr) : null;
 
@@ -344,14 +378,13 @@
 
     const observaciones = (campoObservaciones.value || '').trim();
 
-    // Validación mínima (igual que antes, sin obligar empresa)
     if (!fecha || !localidad || !ubicacion || !horaInicio || !horaFin) {
       alert('Por favor, rellena al menos: Fecha, Localidad, Ubicación, Hora inicio y Hora fin.');
       return;
     }
 
     if (totalHoras === null || isNaN(totalHoras)) {
-      alert('Revisa las horas. No se ha podido calcular el total de horas.');
+      alert('Revisa las horas y el descanso. No se ha podido calcular el total de horas.');
       return;
     }
 
@@ -363,24 +396,21 @@
       ubicacion,
       horaInicio,
       horaFin,
+      descanso,
       totalHoras,
-      // arrays para materiales y cantidades
       materiales: materialesArr,
       cantidades: cantidadesArr,
-      // arrays para trabajos
       trabajosCompletados: trabajosCompletadosArr,
       trabajosPendientes: trabajosPendientesArr,
       observaciones
     };
 
     if (idEditando) {
-      // Editar
       const idx = registros.findIndex(r => r.id === idEditando);
       if (idx !== -1) {
         registros[idx] = registro;
       }
     } else {
-      // Nuevo
       registros.push(registro);
     }
 
@@ -399,12 +429,19 @@
     campoUbicacion.value = reg.ubicacion || '';
     campoHoraInicio.value = reg.horaInicio || '';
     campoHoraFin.value = reg.horaFin || '';
+    if (campoDescanso) campoDescanso.value = reg.descanso || '00:00';
     campoObservaciones.value = reg.observaciones || '';
 
-    // Materiales: compatibilidad con datos antiguos
+    // Total horas al formulario (solo decimal, como se guarda)
+    if (reg.totalHoras != null && !isNaN(reg.totalHoras)) {
+      campoTotalHoras.value = reg.totalHoras.toFixed(2).replace('.', ',');
+    } else {
+      campoTotalHoras.value = '';
+    }
+
+    // Materiales
     limpiarMateriales();
     if (Array.isArray(reg.materiales)) {
-      // Nuevos registros (arrays)
       materialesContainer.innerHTML = '';
       const nombres = reg.materiales || [];
       const cantidades = Array.isArray(reg.cantidades) ? reg.cantidades : [];
@@ -419,10 +456,8 @@
         }
       }
     } else {
-      // Registros antiguos (un solo material / cantidad)
       const nombre = reg.materiales || '';
       const cant = reg.cantidad != null ? reg.cantidad : '';
-      limpiarMateriales();
       materialesContainer.innerHTML = '';
       agregarFilaMaterial(nombre, cant);
     }
@@ -455,7 +490,6 @@
       agregarTrabajoPendiente(reg.trabajosPendientes || '');
     }
 
-    // Recalcular por si acaso
     actualizarTotalHoras();
 
     idEditando = reg.id;
@@ -495,13 +529,15 @@
     const filtroPend = selectFiltroPendientes ? selectFiltroPendientes.value : 'todos';
 
     const listaFiltrada = registros.filter(reg => {
-      // Filtro de texto
       if (filtroTexto) {
         const texto = [
           reg.fecha,
-          reg.empresa, // NUEVO en búsqueda
+          reg.empresa,
           reg.localidad,
           reg.ubicacion,
+          reg.horaInicio,
+          reg.horaFin,
+          reg.descanso,
           Array.isArray(reg.materiales) ? reg.materiales.join(' ') : reg.materiales,
           Array.isArray(reg.trabajosCompletados) ? reg.trabajosCompletados.join(' ') : reg.trabajosCompletados,
           Array.isArray(reg.trabajosPendientes) ? reg.trabajosPendientes.join(' ') : reg.trabajosPendientes,
@@ -514,19 +550,13 @@
         }
       }
 
-      // Filtro por trabajos pendientes
       const hayPendientes = tienePendientes(reg);
-      if (filtroPend === 'conPendientes' && !hayPendientes) {
-        return false;
-      }
-      if (filtroPend === 'sinPendientes' && hayPendientes) {
-        return false;
-      }
+      if (filtroPend === 'conPendientes' && !hayPendientes) return false;
+      if (filtroPend === 'sinPendientes' && hayPendientes) return false;
 
       return true;
     });
 
-    // Orden por fecha + hora inicio (ascendente)
     listaFiltrada.sort((a, b) => {
       const claveA = (a.fecha || '') + ' ' + (a.horaInicio || '');
       const claveB = (b.fecha || '') + ' ' + (b.horaInicio || '');
@@ -558,19 +588,25 @@
       const tdFin = document.createElement('td');
       tdFin.textContent = reg.horaFin || '';
 
+      const tdDescanso = document.createElement('td');
+      tdDescanso.textContent = reg.descanso || '00:00';
+
       const tdHoras = document.createElement('td');
-      tdHoras.textContent = reg.totalHoras != null ? reg.totalHoras.toFixed(2).replace('.', ',') : '';
+      // 👉 AQUÍ USAMOS EL NUEVO FORMATO "HH:MM = x,xx h"
+      tdHoras.textContent =
+        reg.totalHoras != null && !isNaN(reg.totalHoras)
+          ? formatearHorasTotal(reg.totalHoras)
+          : '';
 
       const tdMateriales = document.createElement('td');
       const tdCantidad = document.createElement('td');
 
-      // Mostrar materiales/cantidades: soporta arrays (nueva versión) y valores antiguos
       if (Array.isArray(reg.materiales)) {
-        tdMateriales.textContent = reg.materiales.join('\n');
+        tdMateriales.textContent = reg.materiales.join(' ');
         if (Array.isArray(reg.cantidades)) {
           tdCantidad.textContent = reg.cantidades
             .map(c => (c !== null && c !== undefined ? c : ''))
-            .join('\n');
+            .join(' ');
         } else {
           tdCantidad.textContent = '';
         }
@@ -581,14 +617,14 @@
 
       const tdCompletado = document.createElement('td');
       if (Array.isArray(reg.trabajosCompletados)) {
-        tdCompletado.textContent = reg.trabajosCompletados.join('\n');
+        tdCompletado.textContent = reg.trabajosCompletados.join(' | ');
       } else {
         tdCompletado.textContent = reg.trabajosCompletados || '';
       }
 
       const tdPendiente = document.createElement('td');
       if (Array.isArray(reg.trabajosPendientes)) {
-        tdPendiente.textContent = reg.trabajosPendientes.join('\n');
+        tdPendiente.textContent = reg.trabajosPendientes.join(' | ');
       } else {
         tdPendiente.textContent = reg.trabajosPendientes || '';
       }
@@ -618,6 +654,7 @@
       tr.appendChild(tdUbicacion);
       tr.appendChild(tdInicio);
       tr.appendChild(tdFin);
+      tr.appendChild(tdDescanso);
       tr.appendChild(tdHoras);
       tr.appendChild(tdMateriales);
       tr.appendChild(tdCantidad);
@@ -630,9 +667,7 @@
     });
 
     contadorRegistros.textContent =
-      listaFiltrada.length === 1
-        ? '1 registro'
-        : `${listaFiltrada.length} registros`;
+      listaFiltrada.length === 1 ? '1 registro' : `${listaFiltrada.length} registros`;
   }
 
   // ===============================
@@ -689,7 +724,6 @@
         console.error('Error importando JSON:', err);
         alert('Error al leer el archivo JSON. Revisa que sea correcto.');
       } finally {
-        // reset para poder volver a importar el mismo archivo si se quiere
         inputImport.value = '';
       }
     };
