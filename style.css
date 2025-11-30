@@ -223,8 +223,6 @@ button:active {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.78rem;
-  /* table-layout: auto por defecto, se deja así
-     para que cada columna se ajuste al contenido */
 }
 
 .tabla-registros thead {
@@ -240,23 +238,24 @@ button:active {
   padding: 0.25rem 0.4rem;
   vertical-align: top;
   text-align: left;
-  white-space: nowrap; /* 👉 SIN saltos de línea en las celdas */
+  white-space: nowrap; /* sin saltos de línea */
 }
 
-/* Anchos mínimos por columna (según orden de las columnas)
+/* Anchos mínimos por columna:
    1: Fecha        → 10ch
    2: Empresa      → 20ch
    3: Localidad    → 20ch
    4: Ubicación    → 20ch
    5: Inicio       → 5ch
    6: Fin          → 5ch
-   7: Horas        → 5ch
-   8: Materiales   → 20ch
-   9: Cant.        → 5ch
-  10: Completado   → 20ch
-  11: Pendiente    → 20ch
-  12: Observaciones→ 20ch
-  13: Acciones     → sin mínimo especial
+   7: Descanso     → 5ch
+   8: Horas        → 5ch
+   9: Materiales   → 20ch
+  10: Cant.        → 5ch
+  11: Completado   → 20ch
+  12: Pendiente    → 20ch
+  13: Observaciones→ 20ch
+  14: Acciones     → sin min especial
 */
 
 .tabla-registros th:nth-child(1),
@@ -270,14 +269,14 @@ button:active {
 .tabla-registros td:nth-child(3),
 .tabla-registros th:nth-child(4),
 .tabla-registros td:nth-child(4),
-.tabla-registros th:nth-child(8),
-.tabla-registros td:nth-child(8),
-.tabla-registros th:nth-child(10),
-.tabla-registros td:nth-child(10),
+.tabla-registros th:nth-child(9),
+.tabla-registros td:nth-child(9),
 .tabla-registros th:nth-child(11),
 .tabla-registros td:nth-child(11),
 .tabla-registros th:nth-child(12),
-.tabla-registros td:nth-child(12) {
+.tabla-registros td:nth-child(12),
+.tabla-registros th:nth-child(13),
+.tabla-registros td:nth-child(13) {
   min-width: 20ch;
 }
 
@@ -287,12 +286,13 @@ button:active {
 .tabla-registros td:nth-child(6),
 .tabla-registros th:nth-child(7),
 .tabla-registros td:nth-child(7),
-.tabla-registros th:nth-child(9),
-.tabla-registros td:nth-child(9) {
+.tabla-registros th:nth-child(8),
+.tabla-registros td:nth-child(8),
+.tabla-registros th:nth-child(10),
+.tabla-registros td:nth-child(10) {
   min-width: 5ch;
 }
 
-/* th generales */
 .tabla-registros th {
   font-weight: 600;
   color: #e5e7eb;
@@ -307,7 +307,7 @@ button:active {
 }
 
 .tabla-registros td.acciones {
-  white-space: nowrap; /* ya estaba, y coincide con lo que quieres */
+  white-space: nowrap;
 }
 
 /* CONTADOR */
