@@ -587,11 +587,12 @@
       return true;
     });
 
+    // 👉 Ordenar del más reciente al más antiguo
     listaFiltrada.sort((a, b) => {
       const claveA = (a.fecha || '') + ' ' + (a.horaInicio || '');
       const claveB = (b.fecha || '') + ' ' + (b.horaInicio || '');
-      if (claveA < claveB) return -1;
-      if (claveA > claveB) return 1;
+      if (claveA < claveB) return 1;   // antes iba -1
+      if (claveA > claveB) return -1;  // antes iba  1
       return 0;
     });
 
@@ -629,17 +630,22 @@
 
       const tdMateriales = document.createElement('td');
       tdMateriales.classList.add('multiline');
+
       const tdCantidad = document.createElement('td');
+      tdCantidad.classList.add('multiline');
 
       if (Array.isArray(reg.materiales)) {
+        // Cada material en una línea
         tdMateriales.textContent = reg.materiales.join('\n');
+
         if (Array.isArray(reg.cantidades)) {
+          // Cada cantidad en una línea correspondiente
           tdCantidad.textContent = reg.cantidades
             .map(c => {
               if (c === null || c === undefined || isNaN(c)) return '';
               return formatearCantidad(c);
             })
-            .join(' ');
+            .join('\n');
         } else {
           tdCantidad.textContent = '';
         }
@@ -710,21 +716,10 @@
   }
 
   // ===============================
-  // Generación de contenido XLS (tabla HTML compatible con Excel)
-  // ===============================
+  // Texto tipo tabla para Excel (para copiar al portapapeles)
+// ===============================
 
-  function escaparHTML(texto) {
-    if (texto == null) return '';
-    return String(texto)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function generarContenidoXLS() {
-    let html = '<table border="1">';
-    html += '<thead><tr>';
+  function generarTextoTablaParaExcel() {
     const cabeceras = [
       'Fecha',
       'Empresa',
@@ -740,12 +735,20 @@
       'Trabajos pendientes',
       'Observaciones'
     ];
-    cabeceras.forEach(h => {
-      html += '<th>' + escaparHTML(h) + '</th>';
-    });
-    html += '</tr></thead><tbody>';
 
-    registros.forEach(reg => {
+    const lineas = [];
+    lineas.push(cabeceras.join('\t'));
+
+    // Ordenar igual que en la tabla: más recientes primero
+    const regsOrdenados = [...registros].sort((a, b) => {
+      const claveA = (a.fecha || '') + ' ' + (a.horaInicio || '');
+      const claveB = (b.fecha || '') + ' ' + (b.horaInicio || '');
+      if (claveA < claveB) return 1;
+      if (claveA > claveB) return -1;
+      return 0;
+    });
+
+    regsOrdenados.forEach(reg => {
       const fecha = reg.fecha || '';
       const empresa = reg.empresa || '';
       const localidad = reg.localidad || '';
@@ -791,25 +794,47 @@
 
       const observStr = reg.observaciones || '';
 
-      html += '<tr>';
-      html += '<td>' + escaparHTML(fecha) + '</td>';
-      html += '<td>' + escaparHTML(empresa) + '</td>';
-      html += '<td>' + escaparHTML(localidad) + '</td>';
-      html += '<td>' + escaparHTML(ubicacion) + '</td>';
-      html += '<td>' + escaparHTML(inicio) + '</td>';
-      html += '<td>' + escaparHTML(fin) + '</td>';
-      html += '<td>' + escaparHTML(descanso) + '</td>';
-      html += '<td>' + escaparHTML(totalHorasStr) + '</td>';
-      html += '<td>' + escaparHTML(materialesStr) + '</td>';
-      html += '<td>' + escaparHTML(cantidadesStr) + '</td>';
-      html += '<td>' + escaparHTML(completadosStr) + '</td>';
-      html += '<td>' + escaparHTML(pendientesStr) + '</td>';
-      html += '<td>' + escaparHTML(observStr) + '</td>';
-      html += '</tr>';
+      const fila = [
+        fecha,
+        empresa,
+        localidad,
+        ubicacion,
+        inicio,
+        fin,
+        descanso,
+        totalHorasStr,
+        materialesStr,
+        cantidadesStr,
+        completadosStr,
+        pendientesStr,
+        observStr
+      ].join('\t');
+
+      lineas.push(fila);
     });
 
-    html += '</tbody></table>';
-    return html;
+    return lineas.join('\n');
+  }
+
+  function copiarTextoAlPortapapeles(texto) {
+    // Método clásico con textarea oculto, compatible con WebView / WebIntoApp
+    const textarea = document.createElement('textarea');
+    textarea.value = texto;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    textarea.style.left = '-1000px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    let exito = false;
+    try {
+      exito = document.execCommand('copy');
+    } catch (err) {
+      console.error('Error al copiar al portapapeles:', err);
+      exito = false;
+    }
+    document.body.removeChild(textarea);
+    return exito;
   }
 
   // ===============================
@@ -824,7 +849,6 @@
 
     const fecha = new Date().toISOString().slice(0, 10);
     const nombreJson = `cuaderno_mantenimiento_${fecha}.json`;
-    const nombreXls = `cuaderno_mantenimiento_${fecha}.xls`;
 
     // --- JSON ---
     const contenidoJson = JSON.stringify(registros, null, 2);
@@ -839,31 +863,20 @@
     document.body.removeChild(aJson);
     URL.revokeObjectURL(urlJson);
 
-    // --- XLS (tabla HTML compatible con Excel) ---
-    const contenidoXls = generarContenidoXLS();
-    const blobXls = new Blob([contenidoXls], {
-      type: 'application/vnd.ms-excel'
-    });
-    const urlXls = URL.createObjectURL(blobXls);
-
-    const aXls = document.createElement('a');
-    aXls.href = urlXls;
-    aXls.download = nombreXls;
-    document.body.appendChild(aXls);
-    aXls.click();
-    document.body.removeChild(aXls);
-    URL.revokeObjectURL(urlXls);
+    // --- TEXTO PARA EXCEL (portapapeles) ---
+    const textoTabla = generarTextoTablaParaExcel();
+    const copiado = copiarTextoAlPortapapeles(textoTabla);
 
     const tamañoKB = (contenidoJson.length / 1024).toFixed(1);
 
     alert(
-      "📁 Archivos exportados correctamente.\n\n" +
-      "Se han creado dos ficheros en la carpeta Descargas (/Download):\n\n" +
-      "1️⃣ JSON:\n   " + nombreJson + "\n" +
-      "2️⃣ Excel (.xls):\n   " + nombreXls + "\n\n" +
+      "✅ Exportación completada.\n\n" +
+      "1️⃣ Se ha guardado el archivo JSON en la carpeta Descargas (/Download):\n" +
+      "   " + nombreJson + "\n\n" +
+      "2️⃣ Se ha " + (copiado ? "copiado" : "intentado copiar") + " una tabla al portapapeles.\n" +
+      "   Ahora abre Excel, selecciona la celda A1 y pulsa PEGAR.\n\n" +
       "📦 Tamaño aproximado del JSON:\n" +
-      "   " + tamañoKB + " KB\n\n" +
-      "Ábrelos desde la carpeta 'Descargas' de tu móvil."
+      "   " + tamañoKB + " KB"
     );
   }
 
