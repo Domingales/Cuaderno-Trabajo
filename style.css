@@ -310,6 +310,11 @@ button:active {
   white-space: nowrap;
 }
 
+/* Celdas con varios ítems en líneas distintas */
+.tabla-registros td.multiline {
+  white-space: pre-line;
+}
+
 /* CONTADOR */
 .contador {
   font-size: 0.85rem;
