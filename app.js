@@ -150,7 +150,7 @@
     const inputNombre = document.createElement('input');
     inputNombre.type = 'text';
     inputNombre.className = 'material-nombre';
-    inputNombre.placeholder = 'Rodamientos...';
+    inputNombre.placeholder = 'Material...';
     inputNombre.value = nombre || '';
     divNombre.appendChild(inputNombre);
 
@@ -628,10 +628,11 @@
           : '';
 
       const tdMateriales = document.createElement('td');
+      tdMateriales.classList.add('multiline');
       const tdCantidad = document.createElement('td');
 
       if (Array.isArray(reg.materiales)) {
-        tdMateriales.textContent = reg.materiales.join(' ');
+        tdMateriales.textContent = reg.materiales.join('\n');
         if (Array.isArray(reg.cantidades)) {
           tdCantidad.textContent = reg.cantidades
             .map(c => {
@@ -652,15 +653,17 @@
       }
 
       const tdCompletado = document.createElement('td');
+      tdCompletado.classList.add('multiline');
       if (Array.isArray(reg.trabajosCompletados)) {
-        tdCompletado.textContent = reg.trabajosCompletados.join(' | ');
+        tdCompletado.textContent = reg.trabajosCompletados.join('\n');
       } else {
         tdCompletado.textContent = reg.trabajosCompletados || '';
       }
 
       const tdPendiente = document.createElement('td');
+      tdPendiente.classList.add('multiline');
       if (Array.isArray(reg.trabajosPendientes)) {
-        tdPendiente.textContent = reg.trabajosPendientes.join(' | ');
+        tdPendiente.textContent = reg.trabajosPendientes.join('\n');
       } else {
         tdPendiente.textContent = reg.trabajosPendientes || '';
       }
