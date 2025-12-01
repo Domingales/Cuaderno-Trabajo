@@ -150,7 +150,7 @@
     const inputNombre = document.createElement('input');
     inputNombre.type = 'text';
     inputNombre.className = 'material-nombre';
-    inputNombre.placeholder = 'Material...';
+    inputNombre.placeholder = 'Polea A42...';
     inputNombre.value = nombre || '';
     divNombre.appendChild(inputNombre);
 
